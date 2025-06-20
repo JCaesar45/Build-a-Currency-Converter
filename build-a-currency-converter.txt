@@ -1,0 +1,130 @@
+** start of index.html **
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Currency Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.5/babel.min.js"></script>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      src="index.jsx"
+    ></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div id="root"></div>
+    <script
+      data-plugins="transform-modules-umd"
+      type="text/babel"
+      data-presets="react"
+      data-type="module"
+    >
+      import { CurrencyConverter } from './index.jsx';
+      ReactDOM.createRoot(document.getElementById('root')).render(<CurrencyConverter />);
+    </script>
+</body>
+
+</html>
+
+** end of index.html **
+
+** start of styles.css **
+
+
+
+** end of styles.css **
+
+** start of index.jsx **
+
+const { useState, useMemo } = React;
+
+export function CurrencyConverter() {
+  const exchangeRates = {
+    USD: 1,
+    EUR: 0.92,
+    GBP: 0.78,
+    JPY: 156.7,
+  };
+
+  const currencies = Object.keys(exchangeRates);
+
+  const [amount, setAmount] = useState(1);
+  const [fromCurrency, setFromCurrency] = useState('USD');
+  const [toCurrency, setToCurrency] = useState('EUR');
+
+  // Handle input change
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    // Ensure only numbers are accepted
+    const num = parseFloat(value);
+    if (!isNaN(num)) {
+      setAmount(num);
+    } else {
+      setAmount(0);
+    }
+  };
+
+  const handleFromChange = (e) => {
+    setFromCurrency(e.target.value);
+  };
+
+  const handleToChange = (e) => {
+    setToCurrency(e.target.value);
+  };
+
+  // Memoize the converted amount calculation based on 'fromCurrency' and 'amount'
+  const convertedAmount = useMemo(() => {
+    const rate = exchangeRates[fromCurrency];
+    return amount * rate;
+  }, [amount, fromCurrency]);
+
+  // Calculate the final converted amount based on 'toCurrency'
+  const finalAmount = convertedAmount * exchangeRates[toCurrency];
+
+  // Round to two decimal places
+  const displayAmount = finalAmount.toFixed(2);
+
+  return (
+    <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px', maxWidth: '300px' }}>
+      <h2>Currency Converter</h2>
+      <div style={{ marginBottom: '10px' }}>
+        <label htmlFor="amount-input" style={{ marginRight: '10px' }}>Amount:</label>
+        <input
+          id="amount-input"
+          type="number"
+          value={amount}
+          onChange={handleAmountChange}
+          style={{ width: '100px' }}
+        />
+      </div>
+      <div style={{ marginBottom: '10px' }}>
+        <label htmlFor="from-currency" style={{ marginRight: '10px' }}>From:</label>
+        <select id="from-currency" value={fromCurrency} onChange={handleFromChange}>
+          {currencies.map((curr) => (
+            <option key={curr} value={curr}>{curr}</option>
+          ))}
+        </select>
+      </div>
+      <div style={{ marginBottom: '10px' }}>
+        <label htmlFor="to-currency" style={{ marginRight: '10px' }}>To:</label>
+        <select id="to-currency" value={toCurrency} onChange={handleToChange}>
+          {currencies.map((curr) => (
+            <option key={curr} value={curr}>{curr}</option>
+          ))}
+        </select>
+      </div>
+      <div style={{ fontSize: '1.2em', marginTop: '20px' }}>
+        {displayAmount} {toCurrency}
+      </div>
+    </div>
+  );
+}
+
+** end of index.jsx **
+
